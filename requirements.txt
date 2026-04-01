@@ -1,0 +1,7 @@
+fastapi==0.115.0
+uvicorn==0.30.6
+akshare==1.18.49
+pandas
+pytz
+httpx
+pytest
