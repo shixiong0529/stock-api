@@ -15,6 +15,8 @@ def _clear_proxy_env() -> None:
         "all_proxy",
     ]:
         os.environ.pop(key, None)
+    os.environ["NO_PROXY"] = "*"
+    os.environ["no_proxy"] = "*"
 
 
 _clear_proxy_env()

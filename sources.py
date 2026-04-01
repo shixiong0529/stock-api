@@ -89,7 +89,12 @@ def get_intraday(symbol: str) -> dict[str, Any]:
         else:
             df = ak.stock_zh_a_minute(symbol=_xq_symbol(symbol).lower())
     except Exception as exc:
-        return {"error": "data_unavailable", "message": str(exc), "symbol": symbol}
+        fallback = _fallback_intraday_snapshot(symbol)
+        if fallback is None:
+            return {"error": "data_unavailable", "message": str(exc), "symbol": symbol}
+        result = {"symbol": symbol, "data": [fallback], "fallback": "snapshot"}
+        _cache.set(cache_key, result, ttl=30)
+        return result
 
     result = {"symbol": symbol, "data": df.to_dict(orient="records")}
     _cache.set(cache_key, result, ttl=30)
@@ -252,6 +257,38 @@ def _fallback_news(symbol: str) -> pd.DataFrame:
             .str.replace("\\r\\n", " ", regex=False)
         )
     return df[["关键词", "新闻标题", "新闻内容", "发布时间", "文章来源", "新闻链接"]]
+
+
+def _fallback_intraday_snapshot(symbol: str) -> dict[str, Any] | None:
+    try:
+        df = ak.stock_individual_spot_xq(symbol=_xq_symbol(symbol))
+    except Exception:
+        return None
+
+    if df.empty:
+        return None
+
+    if is_hk(symbol):
+        return {
+            "时间": _safe_item(df, "时间"),
+            "开盘": _safe_number(_safe_item(df, "今开")),
+            "收盘": _safe_number(_safe_item(df, "现价")),
+            "最高": _safe_number(_safe_item(df, "最高")),
+            "最低": _safe_number(_safe_item(df, "最低")),
+            "成交量": _safe_number(_safe_item(df, "成交量")),
+            "成交额": _safe_number(_safe_item(df, "成交额")),
+            "最新价": _safe_number(_safe_item(df, "现价")),
+        }
+
+    return {
+        "day": _safe_item(df, "时间"),
+        "open": _safe_number(_safe_item(df, "今开")),
+        "high": _safe_number(_safe_item(df, "最高")),
+        "low": _safe_number(_safe_item(df, "最低")),
+        "close": _safe_number(_safe_item(df, "现价")),
+        "volume": _safe_number(_safe_item(df, "成交量")),
+        "amount": _safe_number(_safe_item(df, "成交额")),
+    }
 
 
 def _safe_number(value: Any) -> float | int | None:

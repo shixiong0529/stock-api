@@ -5,6 +5,8 @@ set ALL_PROXY=
 set http_proxy=
 set https_proxy=
 set all_proxy=
+set NO_PROXY=*
+set no_proxy=*
 
 :restart
 cd /d C:\Users\Administrator\.openclaw\workspace-stock\stock-api
