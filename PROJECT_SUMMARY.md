@@ -13,13 +13,21 @@
 
 - `http://127.0.0.1:7070`
 
+占位路径说明：
+
+- `<OPENCLAW_HOME>`
+  - 例如 `C:\Users\<YOUR_USER>\.openclaw`
+
+- `<WORKSPACE_ROOT>`
+  - 例如 `<OPENCLAW_HOME>\workspace-stock`
+
 ---
 
 ## 2. 已完成开发
 
-项目目录位于：
+项目目录：
 
-- `C:\Users\Administrator\.openclaw\workspace-stock\stock-api`
+- `<OPENCLAW_HOME>\workspace-stock\stock-api`
 
 核心文件：
 
@@ -208,8 +216,8 @@
 
 修改的工作区文档：
 
-- `C:\Users\Administrator\.openclaw\workspace-stock\TOOLS.md`
-- `C:\Users\Administrator\.openclaw\workspace-stock\AGENTS.md`
+- `<WORKSPACE_ROOT>\TOOLS.md`
+- `<WORKSPACE_ROOT>\AGENTS.md`
 
 这些规则已经明确：
 
@@ -223,7 +231,7 @@
 
 还修改过：
 
-- `C:\Users\Administrator\.openclaw\openclaw.json`
+- `<OPENCLAW_HOME>\openclaw.json`
 
 包括：
 

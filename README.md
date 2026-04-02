@@ -1,13 +1,13 @@
 # stock-api
 
-本项目是一个运行在本机的股票数据服务，使用 `FastAPI` 对外提供 HTTP 接口，供 OpenClaw 的 `stock` agent 通过本地地址 `http://127.0.0.1:7070` 获取 A 股、港股和 A 股全市场总览数据。
+`stock-api` 是一个运行在本机的股票数据服务，使用 `FastAPI` 对外提供 HTTP 接口，供 OpenClaw 的 `stock` agent 通过本地地址 `http://127.0.0.1:7070` 获取 A 股、港股和 A 股全市场总览数据。
 
-它的定位不是做一个公开网站，而是做一个“本机行情中间层”：
+这个项目的定位是“本机行情中间层”：
 
 - 把上游数据源封装成稳定的本地接口
 - 统一个股和市场总览的返回格式
-- 让 Telegram 里的机器人优先调用本地 `stock-api`
-- 避免机器人直接去公网网页拼数据
+- 让机器人优先调用本地 `stock-api`
+- 降低机器人直接拼公网网页数据的依赖
 
 ---
 
@@ -34,43 +34,50 @@
 - `GET /get?symbol={symbol}`
 - `GET /market/summary`
 
-更详细的接口说明见：
+更多细节见：
 
-- [INTERFACES.md](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/INTERFACES.md)
-
-项目摘要见：
-
-- [PROJECT_SUMMARY.md](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/PROJECT_SUMMARY.md)
+- `INTERFACES.md`
+- `PROJECT_SUMMARY.md`
 
 ---
 
 ## 2. 目录结构
 
-项目目录：
+项目目录建议理解为：
 
-- `C:\Users\Administrator\.openclaw\workspace-stock\stock-api`
+- `<OPENCLAW_HOME>\workspace-stock\stock-api`
+
+常见占位说明：
+
+- `<OPENCLAW_HOME>`
+  - 指本机 OpenClaw 根目录
+  - 例如 `C:\Users\<YOUR_USER>\.openclaw`
+
+- `<WORKSPACE_ROOT>`
+  - 指工作区根目录
+  - 例如 `<OPENCLAW_HOME>\workspace-stock`
 
 核心文件：
 
-- [main.py](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/main.py)
+- `main.py`
   - FastAPI 路由入口
 
-- [sources.py](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/sources.py)
+- `sources.py`
   - 数据源封装与聚合逻辑
 
-- [cache.py](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/cache.py)
+- `cache.py`
   - 进程内 TTL 缓存
 
-- [start.bat](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/start.bat)
+- `start.bat`
   - 本地启动脚本
 
-- [requirements.txt](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/requirements.txt)
+- `requirements.txt`
   - Python 依赖
 
-- [market_summary_snapshot.json](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/market_summary_snapshot.json)
+- `market_summary_snapshot.json`
   - 全市场总览快照兜底文件
 
-- [tests](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/tests)
+- `tests/`
   - 自动化测试
 
 ---
@@ -80,13 +87,13 @@
 建议环境：
 
 - Windows
-- Python 3.11+ 或当前本机已验证可用的 Python 3.13
-- 本机可访问 OpenClaw 工作区
+- Python 3.11+
+- 可正常访问本机 OpenClaw 工作区
 
 依赖安装：
 
 ```powershell
-cd C:\Users\Administrator\.openclaw\workspace-stock\stock-api
+cd <OPENCLAW_HOME>\workspace-stock\stock-api
 python -m pip install -r requirements.txt
 ```
 
@@ -97,7 +104,7 @@ python -m pip install -r requirements.txt
 ### 方式一：直接启动批处理
 
 ```powershell
-cd C:\Users\Administrator\.openclaw\workspace-stock\stock-api
+cd <OPENCLAW_HOME>\workspace-stock\stock-api
 .\start.bat
 ```
 
@@ -112,7 +119,7 @@ cd C:\Users\Administrator\.openclaw\workspace-stock\stock-api
 ### 方式二：直接运行 uvicorn
 
 ```powershell
-cd C:\Users\Administrator\.openclaw\workspace-stock\stock-api
+cd <OPENCLAW_HOME>\workspace-stock\stock-api
 $env:HTTP_PROXY=''
 $env:HTTPS_PROXY=''
 $env:ALL_PROXY=''
@@ -126,7 +133,7 @@ python -m uvicorn main:app --host 127.0.0.1 --port 7070 --workers 1
 
 ## 5. 使用方法
 
-### 5.1 浏览器或命令行直接调接口
+### 5.1 命令行直接调接口
 
 健康检查：
 
@@ -190,7 +197,7 @@ C:\Windows\System32\curl.exe --silent --show-error --max-time 30 "http://127.0.0
 ### 6.1 跑自动化测试
 
 ```powershell
-cd C:\Users\Administrator\.openclaw\workspace-stock\stock-api
+cd <OPENCLAW_HOME>\workspace-stock\stock-api
 pytest tests -v
 ```
 
@@ -209,12 +216,12 @@ pytest tests -v
 
 个股接口主要通过现有封装获取数据。
 
-`/market/summary` 这块做过单独适配，原因是全市场抓取更容易遇到上游限流、超时或封禁。
+`/market/summary` 做过单独适配，因为全市场抓取更容易遇到上游限流、超时或封禁。
 
 当前设计是：
 
 - 优先抓实时全市场分页数据与关键指数
-- 如果上游暂时不可用，回退到 [market_summary_snapshot.json](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/market_summary_snapshot.json)
+- 如果上游暂时不可用，回退到 `market_summary_snapshot.json`
 
 这时返回里可能会出现：
 
@@ -232,16 +239,14 @@ pytest tests -v
 建议备份这些内容：
 
 - 整个目录：
-  - `C:\Users\Administrator\.openclaw\workspace-stock\stock-api`
+  - `<OPENCLAW_HOME>\workspace-stock\stock-api`
 
 - OpenClaw 工作区规则文件：
-  - `C:\Users\Administrator\.openclaw\workspace-stock\TOOLS.md`
-  - `C:\Users\Administrator\.openclaw\workspace-stock\AGENTS.md`
+  - `<WORKSPACE_ROOT>\TOOLS.md`
+  - `<WORKSPACE_ROOT>\AGENTS.md`
 
 - OpenClaw 主配置：
-  - `C:\Users\Administrator\.openclaw\openclaw.json`
-
-- 如果配置过计划任务，也记录任务名和启动方式
+  - `<OPENCLAW_HOME>\openclaw.json`
 
 重装后恢复步骤：
 
@@ -259,7 +264,7 @@ pytest tests -v
 迁移时建议整体复制以下目录：
 
 ```text
-C:\Users\Administrator\.openclaw\workspace-stock\stock-api
+<OPENCLAW_HOME>\workspace-stock\stock-api
 ```
 
 然后在新电脑上：
@@ -267,7 +272,7 @@ C:\Users\Administrator\.openclaw\workspace-stock\stock-api
 1. 安装 Python
 2. 安装依赖
 3. 确保 `start.bat` 中的路径仍然正确
-4. 确保新电脑的 OpenClaw 工作区路径一致，或者同步调整相关配置路径
+4. 确保新电脑上的 OpenClaw 工作区路径一致，或者同步调整相关配置
 5. 恢复这些文件：
    - `TOOLS.md`
    - `AGENTS.md`
@@ -276,27 +281,9 @@ C:\Users\Administrator\.openclaw\workspace-stock\stock-api
 
 如果新电脑上的用户名或目录不同，需要重点检查：
 
-- [start.bat](C:/Users/Administrator/.openclaw/workspace-stock/stock-api/start.bat) 里的绝对路径
+- `start.bat` 里的绝对路径
 - OpenClaw 里引用工作区的路径
 - 计划任务里的启动目录和命令
-
-### 8.3 最稳妥的迁移建议
-
-最好把下面几项一起打包备份：
-
-- `stock-api` 目录
-- `TOOLS.md`
-- `AGENTS.md`
-- `openclaw.json`
-- 计划任务导出信息
-- 当前 Python 版本
-- `pip freeze` 导出的依赖清单
-
-可选保存命令：
-
-```powershell
-python -m pip freeze > requirements.lock.txt
-```
 
 ---
 
@@ -311,10 +298,10 @@ python -m pip freeze > requirements.lock.txt
 - `/market/summary` 使用更长超时
 - 没有当前回合成功的本地调用，不要声称“已验证”
 
-相关文件：
+相关工作区文件：
 
-- `C:\Users\Administrator\.openclaw\workspace-stock\TOOLS.md`
-- `C:\Users\Administrator\.openclaw\workspace-stock\AGENTS.md`
+- `<WORKSPACE_ROOT>\TOOLS.md`
+- `<WORKSPACE_ROOT>\AGENTS.md`
 
 ---
 
@@ -331,16 +318,11 @@ python -m pip freeze > requirements.lock.txt
 
 ### 10.2 机器人说“未验证”，但接口明明存在
 
-通常有几种原因：
+常见原因：
 
-- 它这回合没有真正调用本地接口
-- 它调用时超时了
-- 它还在沿用旧 session 里的失败记忆
-
-这时最好：
-
-- 重新发一次请求
-- 看日志确认是否真的调用了本地接口
+- 当前回合没有真正调用本地接口
+- 调用时超时了
+- 还在沿用旧 session 里的失败结论
 
 ### 10.3 `/get 601398` 返回成了行情而不是公告
 
@@ -391,4 +373,4 @@ python -m pip freeze > requirements.lock.txt
 - 自动化测试通过
 - 机器人已出现真实成功调用记录
 
-后续如果重装系统或迁移到新电脑，只要把目录和 OpenClaw 配置一起恢复，整体是可以较低成本复原的。
+后续如果重装系统或迁移到新电脑，只要把目录和 OpenClaw 配置一起恢复，整体可以较低成本复原。
