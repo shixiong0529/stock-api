@@ -59,3 +59,16 @@ def test_announcement_returns_data():
     with patch("main.sources.get_announcement", return_value=mock):
         response = _get_client().get("/announcement?symbol=600519")
     assert response.status_code == 200
+
+
+def test_market_summary_returns_data():
+    mock = {
+        "date": "2026-04-01",
+        "breadth": {"up_count": 3200, "down_count": 1800, "flat_count": 50, "total": 5050},
+        "turnover": {"amount": 1234567890.0, "volume": 987654321.0},
+        "indices": [{"symbol": "sh000001", "name": "上证指数", "price": 3200.0, "change_pct": 0.86}],
+    }
+    with patch("main.sources.get_market_summary", return_value=mock):
+        response = _get_client().get("/market/summary")
+    assert response.status_code == 200
+    assert response.json()["breadth"]["up_count"] == 3200
