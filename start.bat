@@ -9,9 +9,10 @@ set NO_PROXY=*
 set no_proxy=*
 
 :restart
-cd /d C:\Users\Administrator\.openclaw\workspace-stock\stock-api
+cd /d "%~dp0"
 echo [%date% %time%] Starting stock-api on port 7070...
 python -m uvicorn main:app --host 127.0.0.1 --port 7070 --workers 1
 echo [%date% %time%] Service exited. Restarting in 5 seconds...
 timeout /t 5 /nobreak >nul
 goto restart
+
